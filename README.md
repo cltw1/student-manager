@@ -2,7 +2,7 @@
 
 Java + Vue + MySQL 的本地学生管理应用。支持 DeepSeek 在线模型驱动的聊天操作，以及独立的传统管理页面。初始字段为学号和姓名，现支持用户确认后新增正式的文本、整数、小数、日期、布尔字段。
 
-项目目录：`D:\JavaProject\master`。
+项目目录：`D:\JavaProject\student-manager`。
 
 版本控制从当前完整系统建立基线。功能演进见[CHANGELOG.md](CHANGELOG.md)，提交与分支使用方法见[docs/GIT.md](docs/GIT.md)。
 
@@ -35,7 +35,7 @@ Java + Vue + MySQL 的本地学生管理应用。支持 DeepSeek 在线模型驱
 2. 双击根目录 `start.cmd`，或在 PowerShell 中运行：
 
    ```powershell
-   Set-Location D:\JavaProject\master
+   Set-Location D:\JavaProject\student-manager
    powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Start.ps1 -SkipBuild
    ```
 
@@ -50,7 +50,7 @@ API Key 为空时，传统学生管理仍可使用，聊天会明确提示缺少
 需要 JDK 17+、Maven 3.6.3+、Node.js 22.18+/24.12+、MySQL 8.0.16+ 或 8.4。当前机器使用 Java 17、Maven 3.9.5、Node.js 24、MySQL 8.0.34。
 
 ```powershell
-Set-Location D:\JavaProject\master
+Set-Location D:\JavaProject\student-manager
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Build.ps1
 ```
 
@@ -87,15 +87,15 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Initialize-Dat
 将 `.env` 中的变量载入当前终端，启动 Java 后端；另一个终端运行前端：
 
 ```powershell
-Set-Location D:\JavaProject\master
+Set-Location D:\JavaProject\student-manager
 . .\scripts\Common.ps1
 Read-ProjectEnv
 Set-Location .\backend
-mvn -gs ..\scripts\maven-settings.xml -s ..\scripts\maven-settings.xml '-Dmaven.repo.local=D:\JavaProject\master\work\maven-repository' spring-boot:run
+mvn -gs ..\scripts\maven-settings.xml -s ..\scripts\maven-settings.xml '-Dmaven.repo.local=D:\JavaProject\student-manager\work\maven-repository' spring-boot:run
 ```
 
 ```powershell
-Set-Location D:\JavaProject\master\frontend
+Set-Location D:\JavaProject\student-manager\frontend
 npm run dev
 ```
 
@@ -104,7 +104,7 @@ npm run dev
 ## 目录
 
 ```text
-master/
+student-manager/
 ├─ backend/                 Spring Boot 源码及后端测试
 ├─ frontend/                Vue 3 + TypeScript 界面
 ├─ database/schema.sql      两字段学生表建表脚本
