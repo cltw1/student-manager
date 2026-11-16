@@ -1,0 +1,40 @@
+server:
+  address: 127.0.0.1
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+spring:
+  application:
+    name: student-ai-manager
+  datasource:
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3307}/${DB_NAME:student_manager}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${DB_USERNAME:student_app}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 5000
+      initialization-fail-timeout: -1
+  sql:
+    init:
+      mode: never
+  mvc:
+    async:
+      request-timeout: 240000
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
+  jackson:
+    default-property-inclusion: non_null
+    deserialization:
+      use-big-decimal-for-floats: true
+app:
+  ai:
+    base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+    api-key: ${DEEPSEEK_API_KEY:}
+    model: ${DEEPSEEK_MODEL:deepseek-flash}
+    timeout-seconds: ${DEEPSEEK_TIMEOUT_SECONDS:60}
+logging:
+  level:
+    root: INFO
+    com.example.studentmanager: INFO
