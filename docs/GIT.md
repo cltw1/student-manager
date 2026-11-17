@@ -2,14 +2,14 @@
 
 项目从当前完整系统建立第一次提交。以前的功能阶段可阅读根目录`CHANGELOG.md`，没有伪造旧版提交。
 
-当前准备状态：已初始化本地Git，分支为`main`，已配置本仓库的提交身份及忽略规则；尚未暂存、提交、创建GitHub仓库、关联远程或上传。你可以按以下步骤亲自完成。
+项目已完成初始提交并关联远程，默认分支为`main`。以下“第一次上传”保留作参考；后续修改请使用“日常提交”流程，实际进度以`git status`为准。
 
 ## 第一次上传
 
 1. 打开PowerShell并进入项目，查看文件状态：
 
 ```powershell
-Set-Location D:\JavaProject\master
+Set-Location D:\JavaProject\student-manager
 git status
 ```
 
@@ -57,7 +57,7 @@ git push -u origin main
 在项目目录执行：
 
 ```powershell
-Set-Location D:\JavaProject\master
+Set-Location D:\JavaProject\student-manager
 git status
 git diff
 git add .

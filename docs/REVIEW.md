@@ -1,6 +1,6 @@
 # 交互校对与正式字段扩展
 
-本次升级在原项目 `D:\JavaProject\master` 中完成，继续使用Java、Vue、MySQL及线上DeepSeek API。正式数据不因升级自动增加字段或改变值；由你在运行时选择需要的字段。
+项目当前目录为 `D:\JavaProject\student-manager`，使用Java、Vue、MySQL及线上DeepSeek API。正式数据不因升级自动增加字段或改变值；由你在运行时选择需要的字段。
 
 ## 聊天中的折叠处理过程
 

@@ -2,7 +2,7 @@
 
 > 本文件记录首版验证。批量/Excel功能及最新真实DeepSeek验收见 `BATCH-TESTING.md`，使用说明见 `BATCH.md`。
 
-验证日期：2026-11-12。项目目录：`D:\JavaProject\master`。
+验证日期：2026-11-12。项目当前目录：`D:\JavaProject\student-manager`；后续目录变更验证见[RENAME-TESTING.md](RENAME-TESTING.md)。
 
 ## 已通过
 

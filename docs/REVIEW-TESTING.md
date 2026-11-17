@@ -1,6 +1,6 @@
 # 交互校对与字段扩展验证记录
 
-日期：2026-11-16。项目：`D:\JavaProject\master`。
+日期：2026-11-16。项目当前目录：`D:\JavaProject\student-manager`；后续目录变更验证见[RENAME-TESTING.md](RENAME-TESTING.md)。
 
 ## 自动化与构建
 

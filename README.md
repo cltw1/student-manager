@@ -4,6 +4,8 @@ Java + Vue + MySQL 的本地学生管理应用。支持 DeepSeek 在线模型驱
 
 项目目录：`D:\JavaProject\student-manager`。
 
+启动脚本按所在目录定位项目；专用MySQL的路径会在启动前自动适配当前目录。移动或重命名说明见[本地路径与目录变更](docs/LOCAL-PATHS.md)。
+
 版本控制从当前完整系统建立基线。功能演进见[CHANGELOG.md](CHANGELOG.md)，提交与分支使用方法见[docs/GIT.md](docs/GIT.md)。
 
 ## 当前完成情况
