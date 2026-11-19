@@ -52,7 +52,7 @@ public class ActionService {
         actions.entrySet().removeIf(e -> e.getValue().expiresAt.plusSeconds(3600).isBefore(Instant.now()));
         if (actions.size() >= 1000) throw AppException.bad("待办过多，请稍后重试");
         Student before = students.get(studentNo);
-        Student after = type.equals("update_student") ? new Student(StudentService.validate(nextStudentNo == null ? before.studentNo() : nextStudentNo, "学号", 32), StudentService.validate(nextName == null ? before.name() : nextName, "姓名", 50), catalog.normalize(values, before.fields())) : null;
+        Student after = type.equals("update_student") ? new Student(StudentService.validate(nextStudentNo == null ? before.studentNo() : nextStudentNo, "学号", 7), StudentService.validate(nextName == null ? before.name() : nextName, "姓名", 15), catalog.normalize(values, before.fields())) : null;
         Pending pending = new Pending(owner, type, before, after);
         pending.version = catalog.version();
         actions.put(pending.id, pending);

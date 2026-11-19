@@ -1,6 +1,7 @@
 package com.example.studentmanager;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.Iterator;
@@ -65,7 +66,13 @@ public class ToolDispatcher {
                 else if (name.equals("batch_create_students") || name.equals("batch_update_students")) props = (com.fasterxml.jackson.databind.node.ObjectNode) item.path("function").path("parameters").path("properties").path("rows").path("items").path("properties");
                 else continue;
                 var extra = props.putObject("fields"); extra.put("type", "object").put("additionalProperties", false); var fieldProps = extra.putObject("properties");
-                for (StudentField field : catalog.fields()) fieldProps.putObject(field.key()).put("type", field.type().equals("BOOLEAN") ? "boolean" : "string").put("description", field.label() + (field.type().equals("DATE") ? "，格式yyyy-MM-dd" : field.type().equals("INTEGER") || field.type().equals("DECIMAL") ? "，请用十进制字符串，保留完整精度" : ""));
+                for (StudentField field : catalog.fields()) { var property = fieldProps.putObject(field.key()).put("type", field.type().equals("BOOLEAN") ? "boolean" : "string").put("description", field.label() + (field.type().equals("DATE") ? "，格式yyyy-MM-dd" : field.type().equals("INTEGER") || field.type().equals("DECIMAL") ? "，请用十进制字符串，保留完整精度" : "")); if (field.gender()) property.putArray("enum").add("男").add("女"); }
+            }
+            for (var item : result) {
+                var propertiesNode = item.path("function").path("parameters").path("properties");
+                var props = propertiesNode.has("rows") ? propertiesNode.path("rows").path("items").path("properties") : propertiesNode;
+                for (String key : java.util.List.of("studentNo", "newStudentNo")) if (props.path(key).isObject()) ((ObjectNode)props.get(key)).put("minLength", 7).put("maxLength", 7).put("pattern", StudentService.STUDENT_NO_PATTERN);
+                if (props.path("name").isObject()) ((ObjectNode)props.get("name")).put("maxLength", 15);
             }
             return result;
         } catch (Exception ex) { throw new IllegalStateException(ex); }

@@ -85,6 +85,8 @@ public class ExcelImportService {
             CellStyle text = workbook.createCellStyle(); text.setDataFormat(workbook.createDataFormat().getFormat("@"));
             sheet.setDefaultColumnStyle(0, text); sheet.setDefaultColumnStyle(1, text);
             sheet.setColumnWidth(0, 26 * 256); sheet.setColumnWidth(1, 22 * 256); sheet.createFreezePane(0, 1);
+            int fieldColumn = 2;
+            for (StudentField field : catalog.fields()) { if (field.gender()) { var helper = sheet.getDataValidationHelper(); var validation = helper.createValidation(helper.createExplicitListConstraint(new String[]{"男", "女"}), new org.apache.poi.ss.util.CellRangeAddressList(1, 500, fieldColumn, fieldColumn)); validation.setShowErrorBox(true); validation.setErrorStyle(org.apache.poi.ss.usermodel.DataValidation.ErrorStyle.STOP); validation.createErrorBox("性别格式错误", "性别只能选择男或女"); sheet.addValidationData(validation); } fieldColumn++; }
             workbook.write(output); return output.toByteArray();
         } catch (Exception ex) { throw new IllegalStateException("Excel模板生成失败", ex); }
     }

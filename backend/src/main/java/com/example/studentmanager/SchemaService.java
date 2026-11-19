@@ -52,7 +52,7 @@ public class SchemaService {
                 }
                 execute(connection, "CREATE TABLE " + FieldCatalog.quote(stage) + " LIKE student");
             } else {
-                execute(connection, "CREATE TABLE " + FieldCatalog.quote(stage) + " (student_no VARCHAR(32) PRIMARY KEY, name VARCHAR(50) NOT NULL" + old.stream().map(field -> ", " + definition(field)).collect(java.util.stream.Collectors.joining()) + ")");
+                execute(connection, "CREATE TABLE " + FieldCatalog.quote(stage) + " (student_no VARCHAR(7) PRIMARY KEY CHECK (student_no REGEXP '^[1-9][0-9]{6}$'), name VARCHAR(15) NOT NULL CHECK (CHAR_LENGTH(name) BETWEEN 1 AND 15 AND CHAR_LENGTH(TRIM(name)) > 0)" + old.stream().map(field -> ", " + definition(field)).collect(java.util.stream.Collectors.joining()) + ")");
             }
             created = true;
             for (StudentField field : additions) execute(connection, "ALTER TABLE " + FieldCatalog.quote(stage) + " ADD COLUMN " + definition(field));
@@ -87,6 +87,6 @@ public class SchemaService {
             catalog.invalidate(); gate.lock.writeLock().unlock();
         }
     }
-    private String definition(StudentField field) { return FieldCatalog.quote(field.key()) + " " + field.sqlType() + (field.required() ? " NOT NULL" : " NULL") + " COMMENT '" + catalog.comment(field) + "'"; }
+    private String definition(StudentField field) { return FieldCatalog.quote(field.key()) + " " + field.sqlType() + (field.required() ? " NOT NULL" : " NULL") + " COMMENT '" + catalog.comment(field) + "'" + (field.gender() ? " CHECK (" + FieldCatalog.quote(field.key()) + " IN ('男','女'))" : ""); }
     private void execute(Connection connection, String sql) throws Exception { try (var statement = connection.createStatement()) { statement.setQueryTimeout(30); statement.execute(sql); } }
 }

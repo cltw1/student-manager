@@ -2,10 +2,16 @@
 
 默认地址：`http://127.0.0.1:8080`。所有接口仅面向本地使用。
 
+学号格式为`^[1-9][0-9]{6}# API 与执行流程
+
+默认地址：`http://127.0.0.1:8080`。所有接口仅面向本地使用。
+
+，姓名最多15个Unicode字符。性别字段的`options`为`["男","女"]`，写入其他值返回400；重复学号返回409。
+
 ## 普通响应
 
 ```json
-{"success":true,"code":"STUDENT_CREATED","message":"新增成功","data":{"studentNo":"20260001","name":"张三"},"requestId":"随机请求标识"}
+{"success":true,"code":"STUDENT_CREATED","message":"新增成功","data":{"studentNo":"2670001","name":"张三"},"requestId":"随机请求标识"}
 ```
 
 业务失败返回对应 HTTP 状态并设置 `success=false`。主要状态：400 参数无效，404 学生/会话不存在，409 学号冲突或记录已变化，503 数据库不可用。内部异常细节不返回前端。

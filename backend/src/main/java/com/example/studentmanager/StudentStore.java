@@ -33,14 +33,14 @@ public class StudentStore {
         if (result.isEmpty()) throw new AppException(HttpStatus.NOT_FOUND, "STUDENT_NOT_FOUND", "学号 " + id + " 不存在");
         return result.get(0);
     }
-    public Student get(String id) { return read(() -> find(StudentService.validate(id, "学号", 32), false)); }
+    public Student get(String id) { return read(() -> find(StudentService.validate(id, "学号", 7), false)); }
     public List<Student> all() { return read(() -> { var fields = catalog.fields(); return jdbc.query("SELECT " + columns(fields) + " FROM student ORDER BY student_no", (rs, row) -> from(rs, fields)); }); }
     public StudentPage search(String studentNo, String name, int page, int pageSize) {
         return read(() -> {
             if (page < 1 || page > 100000 || pageSize < 1 || pageSize > 100) throw AppException.bad("页码必须为1～100000，每页条数必须为1～100");
             String where = " WHERE 1=1"; List<Object> args = new ArrayList<>();
-            if (studentNo != null && !studentNo.isBlank()) { where += " AND student_no = ?"; args.add(StudentService.validate(studentNo, "学号", 32)); }
-            if (name != null && !name.isBlank()) { where += " AND name LIKE ? ESCAPE '!'"; args.add("%" + StudentService.validate(name, "姓名", 50).replace("!", "!!").replace("%", "!%").replace("_", "!_") + "%"); }
+            if (studentNo != null && !studentNo.isBlank()) { where += " AND student_no = ?"; args.add(StudentService.validate(studentNo, "学号", 7)); }
+            if (name != null && !name.isBlank()) { where += " AND name LIKE ? ESCAPE '!'"; args.add("%" + StudentService.validate(name, "姓名", 15).replace("!", "!!").replace("%", "!%").replace("_", "!_") + "%"); }
             Long count = jdbc.queryForObject("SELECT COUNT(*) FROM student" + where, Long.class, args.toArray());
             args.add(pageSize); args.add((page - 1) * pageSize); var fields = catalog.fields();
             return new StudentPage(jdbc.query("SELECT " + columns(fields) + " FROM student" + where + " ORDER BY student_no LIMIT ? OFFSET ?", (rs, row) -> from(rs, fields), args.toArray()), count == null ? 0 : count, page, pageSize);
@@ -73,7 +73,7 @@ public class StudentStore {
     }
     public Student update(String id, String nextId, String name, String expectedName, Map<String, Object> input, Map<String, Object> expectedFields) {
         return write(() -> {
-            Student current = find(StudentService.validate(id, "原学号", 32), true); snapshot(current, expectedName, expectedFields);
+            Student current = find(StudentService.validate(id, "原学号", 7), true); snapshot(current, expectedName, expectedFields);
             Student normalized = StudentService.normalized(nextId, name); Map<String, Object> values = catalog.normalize(input, current.fields());
             String assignments = "student_no=?, name=?"; List<Object> args = new ArrayList<>(List.of(normalized.studentNo(), normalized.name()));
             for (StudentField field : catalog.fields()) { assignments += ", " + FieldCatalog.quote(field.key()) + "=?"; args.add(values.get(field.key())); }
@@ -82,7 +82,7 @@ public class StudentStore {
         });
     }
     public Student delete(String id, String expectedName, Map<String, Object> expectedFields) {
-        return write(() -> { Student current = find(StudentService.validate(id, "学号", 32), true); snapshot(current, expectedName, expectedFields); jdbc.update("DELETE FROM student WHERE student_no=?", current.studentNo()); return current; });
+        return write(() -> { Student current = find(StudentService.validate(id, "学号", 7), true); snapshot(current, expectedName, expectedFields); jdbc.update("DELETE FROM student WHERE student_no=?", current.studentNo()); return current; });
     }
     private void snapshot(Student current, String name, Map<String, Object> fields) {
         if ((name != null && !current.name().equals(name)) || (fields != null && !current.fields().equals(catalog.normalize(fields, null)))) throw new AppException(HttpStatus.CONFLICT, "STUDENT_CHANGED", "学生信息已发生变化，请刷新并重新确认");

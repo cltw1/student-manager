@@ -29,26 +29,26 @@ class ChatWorkflowIntegrationTest {
     }
     @Test void createQueryModifyCancelAndDeleteUseActualBusinessServices() {
         String owner = chats.create().id();
-        toolResponse("create_student", "{\"studentNo\":\"001\",\"name\":\"张三\"}");
+        toolResponse("create_student", "{\"studentNo\":\"1000001\",\"name\":\"张三\"}");
         chats.chat(owner, "r1", "添加学生001张三", (event, data) -> {});
-        assertThat(students.get("001").name()).isEqualTo("张三");
-        toolResponse("get_student", "{\"studentNo\":\"001\"}");
+        assertThat(students.get("1000001").name()).isEqualTo("张三");
+        toolResponse("get_student", "{\"studentNo\":\"1000001\"}");
         chats.chat(owner, "r2", "查询001", (event, data) -> {});
         assertThat(chats.detail(owner).messages().get(3).results.get(0).code()).isEqualTo("STUDENT_FOUND");
-        toolResponse("update_student", "{\"studentNo\":\"001\",\"newStudentNo\":\"002\",\"name\":\"李四\"}");
+        toolResponse("update_student", "{\"studentNo\":\"1000001\",\"newStudentNo\":\"1000002\",\"name\":\"李四\"}");
         chats.chat(owner, "r3", "把001改成002李四", (event, data) -> {});
         var pending = chats.detail(owner).messages().get(5).results.get(0);
-        assertThat(students.get("001").name()).isEqualTo("张三");
+        assertThat(students.get("1000001").name()).isEqualTo("张三");
         assertThat(chats.resolve(owner, pending.action().id(), true).code()).isEqualTo("STUDENT_UPDATED");
         assertThat(chats.resolve(owner, pending.action().id(), true).code()).isEqualTo("STUDENT_UPDATED");
-        assertThat(students.get("002").name()).isEqualTo("李四");
+        assertThat(students.get("1000002").name()).isEqualTo("李四");
         assertThat(chats.detail(owner).messages().get(5).results.get(0).action().status()).isEqualTo("CONFIRMED");
-        toolResponse("delete_student", "{\"studentNo\":\"002\"}");
+        toolResponse("delete_student", "{\"studentNo\":\"1000002\"}");
         chats.chat(owner, "r4", "删除002", (event, data) -> {});
         var cancelled = chats.detail(owner).messages().get(7).results.get(0);
         assertThat(chats.resolve(owner, cancelled.action().id(), false).code()).isEqualTo("ACTION_CANCELLED");
         assertThat(students.count()).isEqualTo(1);
-        toolResponse("delete_student", "{\"studentNo\":\"002\"}");
+        toolResponse("delete_student", "{\"studentNo\":\"1000002\"}");
         chats.chat(owner, "r5", "删除002", (event, data) -> {});
         var deletion = chats.detail(owner).messages().get(9).results.get(0);
         assertThat(chats.resolve(owner, deletion.action().id(), true).code()).isEqualTo("STUDENT_DELETED");

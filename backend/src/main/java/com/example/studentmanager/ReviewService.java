@@ -87,9 +87,19 @@ public class ReviewService {
             var lines = raw.lines().filter(line -> !line.isBlank()).toList();
             String header = lines.get(0); if (lines.size() > 1 && header.matches(".*[：:]\\s*")) header = lines.get(1);
             var cells = header.strip().split("[\\s,，\\t]+");
-            if (cells.length > 1 && ImportReader.alias(cells[0]) != null) {
+            if (cells.length > 0 && ImportReader.alias(cells[0]) != null) {
                 Set<String> canonical = new HashSet<>(List.of("学号", "姓名", "新学号")); catalog.fields().forEach(field -> canonical.add(field.label()));
                 Set<String> seen = new HashSet<>(); for (String cell : cells) if (!canonical.contains(cell) || !seen.add(cell)) return true;
+                try {
+                    ImportGrid grid = reader.text(raw, true);
+                    for (var row : grid.rows()) for (int column = 0; column < grid.headers().size(); column++) {
+                        String label = grid.headers().get(column), value = column < row.values().size() ? row.values().get(column) : "";
+                        String core = ImportReader.alias(label);
+                        if ("studentNo".equals(core) || "newStudentNo".equals(core)) StudentService.validate(value, "学号", 7);
+                        else if ("name".equals(core)) StudentService.validate(value, "姓名", 15);
+                        else for (StudentField field : catalog.fields()) if (field.label().equals(label)) field.normalize(value);
+                    }
+                } catch (AppException ex) { return true; }
             }
         }
         return false;
@@ -192,7 +202,7 @@ public class ReviewService {
             if (row.excluded) continue;
             String id = value(d, row, "studentNo"), name = value(d, row, "name"); Student before = currentById.get(id.strip());
             for (var error : row.errors.entrySet()) if (!IGNORE.equals(d.mappings.get(error.getKey()))) { var issue = issue("SOURCE_CELL_ERROR", error.getValue(), row.number, error.getKey(), null); row.issues.add(issue); d.issues.add(issue); }
-            try { StudentService.validate(id, "学号", 32); } catch (AppException ex) { problem(d, row, "INVALID_STUDENT_NO", ex.getMessage(), "studentNo", cleanId(id)); }
+            try { StudentService.validate(id, "学号", 7); } catch (AppException ex) { problem(d, row, "INVALID_STUDENT_NO", ex.getMessage(), "studentNo", cleanId(id)); }
             if (!id.isBlank() && !id.equals(id.strip())) problem(d, row, "FORMAT_SUGGESTION", "学号首尾有空格，是否移除？", "studentNo", id.strip());
             if (!id.isBlank() && frequency.getOrDefault(id.strip(), 0) > 1) problem(d, row, "DUPLICATE_ID", "本批有相同学号，请选择保留记录或排除重复行", "studentNo", null);
             if (id.isBlank() || before == null) row.candidates = current.stream().filter(student -> !name.isBlank() && student.name().equals(name.strip()) || !id.isBlank() && student.studentNo().equalsIgnoreCase(cleanId(id))).limit(10).toList();
@@ -203,7 +213,7 @@ public class ReviewService {
             } else {
                 if (d.mode.equals("CREATE") && before != null) problem(d, row, "STUDENT_EXISTS", "学号已存在：是想更新已有学生吗？可切换为更新/新增或更新，或修改学号、排除此行", "studentNo", null, "UPDATE", "UPSERT");
                 if (Set.of("UPDATE", "DELETE", "QUERY").contains(d.mode) && before == null) problem(d, row, "STUDENT_NOT_FOUND", "找不到该学号：请核对或选择候选；若想新增，请明确切换操作类型", "studentNo", null, "CREATE", "UPSERT");
-                if (creating || mapped(d, "name") && !Set.of("DELETE", "QUERY").contains(d.mode)) try { StudentService.validate(name, "姓名", 50); } catch (AppException ex) { problem(d, row, "INVALID_NAME", ex.getMessage(), "name", null); }
+                if (creating || mapped(d, "name") && !Set.of("DELETE", "QUERY").contains(d.mode)) try { StudentService.validate(name, "姓名", 15); } catch (AppException ex) { problem(d, row, "INVALID_NAME", ex.getMessage(), "name", null); }
                 if (mapped(d, "name") && !name.equals(name.strip())) problem(d, row, "FORMAT_SUGGESTION", "姓名首尾有空格，是否移除？", "name", name.strip());
                 if (d.mode.equals("DELETE") && before != null && !name.isBlank() && !name.strip().equals(before.name())) problem(d, row, "NAME_MISMATCH", "姓名与当前学号不一致，请核对目标学生后修改或排除", "name", null);
             }
@@ -248,6 +258,7 @@ public class ReviewService {
     }
     private String cleanId(String id) { return java.text.Normalizer.normalize(id == null ? "" : id, java.text.Normalizer.Form.NFKC).replaceAll("[\\u200B-\\u200D\\uFEFF]", "").strip(); }
     private String conversion(StudentField field, String raw) {
+        if (field.gender()) { String value = raw.strip().toLowerCase(java.util.Locale.ROOT); if (Set.of("male", "m", "男性").contains(value)) return "男"; if (Set.of("female", "f", "女性").contains(value)) return "女"; return null; }
         String value = java.text.Normalizer.normalize(raw, java.text.Normalizer.Form.NFKC).strip();
         if (field.type().equals("BOOLEAN")) { if (Set.of("是", "yes", "Y", "1", "YES").contains(value)) return "true"; if (Set.of("否", "no", "N", "0", "NO").contains(value)) return "false"; }
         if (field.type().equals("DATE")) for (String format : List.of("uuuu/M/d", "uuuu年M月d日", "uuuuMMdd")) try { return java.time.LocalDate.parse(value, java.time.format.DateTimeFormatter.ofPattern(format).withResolverStyle(java.time.format.ResolverStyle.STRICT)).toString(); } catch (Exception ignored) {}

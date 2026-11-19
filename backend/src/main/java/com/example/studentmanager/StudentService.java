@@ -19,13 +19,15 @@ public class StudentService {
     public Student delete(String id, String expectedName) { return store.delete(id, expectedName, null); }
     public Student delete(String id, String expectedName, Map<String, Object> expectedFields) { return store.delete(id, expectedName, expectedFields); }
     public long count() { return search(null, null, 1, 1).total(); }
-    public static Student normalized(String id, String name) { return new Student(validate(id, "学号", 32), validate(name, "姓名", 50)); }
+    public static final String STUDENT_NO_PATTERN = "^[1-9][0-9]{6}$";
+    public static Student normalized(String id, String name) { return new Student(validate(id, "学号", 7), validate(name, "姓名", 15)); }
     public static String validate(String value, String field, int length) {
         if (value == null || value.strip().isEmpty()) throw AppException.bad(field + "不能为空");
         String trimmed = value.strip();
-        if (trimmed.length() > length) throw AppException.bad(field + "不能超过" + length + "个字符");
+        if (field.contains("学号") && !trimmed.matches(STUDENT_NO_PATTERN)) throw AppException.bad("学号必须为7位数字，首位不能为0");
+        int maximum = field.contains("姓名") ? 15 : length;
+        if (trimmed.codePointCount(0, trimmed.length()) > maximum) throw AppException.bad(field + "不能超过" + maximum + "个字符");
         if (trimmed.codePoints().anyMatch(Character::isISOControl)) throw AppException.bad(field + "不能包含控制字符");
-        if (field.contains("学号") && !trimmed.matches("[A-Za-z0-9_-]+")) throw AppException.bad("学号只允许英文字母、数字、下划线和连字符");
         return trimmed;
     }
 }

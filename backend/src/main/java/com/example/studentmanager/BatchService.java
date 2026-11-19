@@ -41,9 +41,9 @@ public class BatchService {
             try {
                 if (input == null) throw AppException.bad("学生记录不能为空");
                 if (input.error() != null) throw AppException.bad(input.error());
-                id = StudentService.validate(id, "学号", 32);
+                id = StudentService.validate(id, "学号", 7);
                 if (ids.getOrDefault(id, 0) > 1) throw AppException.bad("本批次学号重复，请去重后重新处理");
-                String target = newId == null ? id : StudentService.validate(newId, "新学号", 32);
+                String target = newId == null ? id : StudentService.validate(newId, "新学号", 7);
                 if ((mode.equals("UPDATE") || mode.equals("UPSERT")) && targets.getOrDefault(target, 0) > 1) throw AppException.bad("本批次有多个记录使用相同的新学号");
                 Student before = null;
                 try { before = students.get(id); }

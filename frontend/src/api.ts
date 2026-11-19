@@ -1,4 +1,4 @@
-export interface StudentField { key: string; label: string; type: 'TEXT' | 'INTEGER' | 'DECIMAL' | 'DATE' | 'BOOLEAN'; required: boolean }
+export interface StudentField { key: string; label: string; type: 'TEXT' | 'INTEGER' | 'DECIMAL' | 'DATE' | 'BOOLEAN'; required: boolean; options?: string[] }
 export interface Student { studentNo: string; name: string; fields?: Record<string, unknown> }
 export interface StudentPage { items: Student[]; total: number; page: number; pageSize: number }
 export interface BatchRow { row: number; studentNo?: string; name?: string; newStudentNo?: string; before?: Student; after?: Student; operation: string; status: string; code: string; message: string }
